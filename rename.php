@@ -96,6 +96,15 @@ foreach (dirtree($newIconPath) as $k => $dir) {
         $directory = dirtree($newIconPath . $k);
         file_put_contents($jsonFile, json_encode($directory));
     }
+    if ($k === 'reward') {
+        foreach ($dir as $ks => $subdir) {
+            if (is_dir($newIconPath . $k . DIRECTORY_SEPARATOR . $ks)) {
+                $jsonFile = $newIconPath . $k . DIRECTORY_SEPARATOR . $ks . DIRECTORY_SEPARATOR . 'index.json';
+                $directory = dirtree($newIconPath . $k . DIRECTORY_SEPARATOR . $ks);
+                file_put_contents($jsonFile, json_encode($directory));
+            }
+        }
+    }
 }
 
 function dirtree($dir, $ignoreEmpty=false) {
