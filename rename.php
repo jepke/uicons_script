@@ -14,18 +14,26 @@ foreach ($iconsInFolder as $k => $icon) {
             $pokemonId = ($iconInfo[0] === '000') ? '0' : ltrim($iconInfo[0], '0');
             $formId = ($iconInfo[1] === '00') ? '' : '_f' . ltrim($iconInfo[1], '0');
             $evolutionId = '';
+            $costumeId = '';
             $genderId = '';
+            $shiny = '';
             if (in_array($pokemonId, $megaPokemon)) {
                 $evolutionId = array_key_exists(2, $iconInfo) ? '_e' . ltrim($iconInfo[2], '0') : '';
-                $costumeId = array_key_exists(3, $iconInfo) ? '_c' . ltrim($iconInfo[3], '0') : '';
+                if (array_key_exists(3, $iconInfo)) {
+                    $costumeId = ($iconInfo[3] === 'shiny' && $iconInfo[2] > 0) ? '' : '_c' . ltrim($iconInfo[3], '0');
+                    $shiny = $iconInfo[3] === 'shiny' ? '_s' : '';
+                }
             } else {
-                $costumeId = array_key_exists(2, $iconInfo) ? '_c' . ltrim($iconInfo[2], '0') : '';
+                if (array_key_exists(2, $iconInfo)) {
+                    $costumeId = ($iconInfo[2] === 'shiny' && $iconInfo[2] > 0) ? '' : '_c' . ltrim($iconInfo[2], '0');
+                    $shiny = $iconInfo[2] === 'shiny' ? '_s' : '';
+                }
             }
             if (!is_dir($newIconPath . 'pokemon')) {
                 mkdir($newIconPath . 'pokemon', 0755);
                 echo 'New pokemon folder created.' . PHP_EOL;
             }
-            $newIcon = $newIconPath . 'pokemon/' . $pokemonId . $evolutionId . $formId . $costumeId . $genderId . '.png';
+            $newIcon = $newIconPath . 'pokemon/' . $pokemonId . $evolutionId . $formId . $costumeId . $genderId . $shiny . '.png';
             print_r('Old icon name: ' . $icon . "     \t New icon name: " . $newIcon . PHP_EOL);
             copy($oldIcon, $newIcon);
         }
@@ -33,7 +41,6 @@ foreach ($iconsInFolder as $k => $icon) {
     } else if ($k == 'rewards') {
         $rewardsInFolder = dirtree($oldIconPath . 'rewards');
         foreach ($rewardsInFolder as $k => $reward) {
-            break;
             $oldRewardIcon = $oldIconPath . 'rewards/' . $reward;
             if (str_starts_with($reward, 'reward_') && ! str_starts_with($reward, 'reward_mega') && ! str_starts_with($reward, 'reward_stardust')) {
                 $rewardInfo = explode('_', (basename(str_replace('reward_', '', $reward), '.png')));
@@ -52,7 +59,7 @@ foreach ($iconsInFolder as $k => $icon) {
                 print_r('Old icon name: ' . $reward . "     \t New icon name: " . $newRewardIcon . PHP_EOL);
                 copy($oldRewardIcon, $newRewardIcon);
             }
-            if (str_starts_with($reward, 'reward_mega_energy_')) {
+            if (str_starts_with($reward, 'reward_mega_energy')) {
                 $megaInfo = explode('_', (basename(str_replace('reward_mega_energy_', '', $reward), '.png')));
                 $megaId = is_array($megaInfo) ? $megaInfo[0] : '0';
 
@@ -64,11 +71,14 @@ foreach ($iconsInFolder as $k => $icon) {
                     mkdir($newIconPath . 'reward/mega_resource', 0755);
                     echo 'New mega_resource folder created.' . PHP_EOL;
                 }
+                if ($reward === 'reward_mega_energy.png') {
+                    $megaId = '0';
+                }
                 $newMegaIcon = $newIconPath . 'reward/mega_resource/' . $megaId . '.png';
                 print_r('Old icon name: ' . $reward . "     \t New icon name: " . $newMegaIcon . PHP_EOL);
                 copy($oldRewardIcon, $newMegaIcon);
             }
-            if (str_starts_with($reward, 'reward_stardust_')) {
+            if (str_starts_with($reward, 'reward_stardust')) {
                 $dustInfo = explode('_', (basename(str_replace('reward_stardust_', '', $reward), '.png')));
                 $dustAmount = is_array($dustInfo) ? $dustInfo[0] : '0';
 
@@ -79,6 +89,9 @@ foreach ($iconsInFolder as $k => $icon) {
                 if (!is_dir($newIconPath . 'reward/stardust')) {
                     mkdir($newIconPath . 'reward/stardust', 0755);
                     echo 'New stardust folder created.' . PHP_EOL;
+                }
+                if ($reward === 'reward_stardust.png') {
+                    $dustAmount = '0';
                 }
                 $newDustIcon = $newIconPath . 'reward/stardust/' . $dustAmount . '.png';
                 print_r('Old icon name: ' . $reward . "     \t New icon name: " . $newDustIcon . PHP_EOL);
